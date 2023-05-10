@@ -52,7 +52,6 @@ interface QwikGraphQLClientProps {
   endpoint: string;
   requestConfig?: QwikGraphqlClientRequestConfig;
 }
-
 export default component$((props: QwikGraphQLClientProps) => {
   const client = new QwikGraphQLClient(props.endpoint, props.requestConfig);
 

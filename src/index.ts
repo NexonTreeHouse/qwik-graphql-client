@@ -1,6 +1,6 @@
 import ClientProvider, {
   QwikGraphQLClient,
-} from "./components/logo/client-provider";
-import useQuery from "./components/logo/useQuery";
+} from "./components/client-provider";
+import useQuery from "./hooks/useQuery";
 
 export { useQuery, ClientProvider, QwikGraphQLClient };
