@@ -17,7 +17,7 @@ jobs:
         # uses: pnpm/action-setup@c3b53f6a16e57305370b4ae5a540c2077a1d50dd
         uses: pnpm/action-setup@v2.2.4
         with:
-          version: 7.18.2
+          version: 7.26.0
       - name: Setup node env 🏗
         uses: actions/setup-node@v3
         with:
@@ -25,6 +25,6 @@ jobs:
           registry-url: https://registry.npmjs.org/
           cache: "pnpm"
       - run: pnpm i --frozen-lockfile
-      - run: pnpm publish
+      - run: pnpm publish --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
