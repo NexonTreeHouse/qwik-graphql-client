@@ -1,7 +1,7 @@
 {
-  "name": "my-qwik-library-name",
+  "name": "qwik-graphql-client",
   "version": "0.0.1",
-  "description": "Create a reusable Qwik component library",
+  "description": "Introducing the Qwik GraphQL Client - the coolest cat on the block when it comes to consuming GraphQL APIs! This package is the ultimate wingman for your Qwik projects, giving you all the tools you need to easily retrieve data from GraphQL servers",
   "main": "./lib/index.qwik.mjs",
   "qwik": "./lib/index.qwik.mjs",
   "types": "./lib-types/index.d.ts",
