@@ -43,8 +43,8 @@ interface QwikGraphqlClientRequestConfig
     AdditionalRequestOptions {
   method?: HTTPMethodInput;
   headers?: MaybeLazy$<string[][] | Record<string, string>>;
-  requestMiddleware?: RequestMiddleware$;
-  responseMiddleware?: ResponseMiddleware$;
+  requestMiddleware$?: RequestMiddleware$;
+  responseMiddleware$?: ResponseMiddleware$;
 }
 
 interface QwikGraphQLClientProps {
@@ -56,7 +56,7 @@ export default component$((props: QwikGraphQLClientProps) => {
 
   const state = useStore<ClientContext>({
     client: noSerialize(client),
-    responseMiddleware: props.requestConfig?.responseMiddleware,
+    responseMiddleware: props.requestConfig?.responseMiddleware$,
   });
 
   useVisibleTask$(() => {
@@ -64,7 +64,7 @@ export default component$((props: QwikGraphQLClientProps) => {
       new QwikGraphQLClient(props.endpoint, props.requestConfig)
     );
 
-    state.responseMiddleware = props.requestConfig?.responseMiddleware;
+    state.responseMiddleware = props.requestConfig?.responseMiddleware$;
   });
 
   useContextProvider(ClientContext, state);
@@ -83,7 +83,7 @@ export class QwikGraphQLClient {
     };
 
     this.client = new GraphQLClient(url, baseRequestConfig as RequestConfig);
-    this.responseMiddleware = requestConfig.responseMiddleware;
+    this.responseMiddleware = requestConfig.responseMiddleware$;
   }
 
   public async request<T>(

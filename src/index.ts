@@ -4,4 +4,9 @@ import ClientProvider, {
 import useQuery from "./hooks/useQuery";
 import { gql } from "graphql-request";
 
-export { useQuery, ClientProvider, QwikGraphQLClient, gql };
+export {
+  useQuery,
+  ClientProvider as GraphQLClientProvider,
+  QwikGraphQLClient,
+  gql,
+};
