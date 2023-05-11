@@ -149,6 +149,6 @@ Contributions are welcome, please open an issue and/or create a pull request.
 
 ### Contributors
 
-<a href="https://github.com/NexonTreeHouse/qwik-graphql-client/graphs/contributors">
-<img src="https://contrib.rocks/image?repo=NexonTreeHouse/qwik-graphql-client" />
+<a href="https://github.com/nexontreehouse/qwik-graphql-client/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=nexontreehouse/qwik-graphql-client" />
 </a>
