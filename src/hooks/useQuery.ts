@@ -1,7 +1,7 @@
 import { useContext, $ } from "@builder.io/qwik";
 import { type RequestDocument, type Variables } from "graphql-request";
 import { ClientContext } from "../components/client-provider";
-import { TypedDocumentNode } from "@graphql-typed-document-node/core";
+import { type TypedDocumentNode } from "@graphql-typed-document-node/core";
 import { print } from "graphql";
 
 export default function useQuery<T = unknown, V extends Variables = Variables>(
