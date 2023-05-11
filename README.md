@@ -1,19 +1,18 @@
 # qwik-graphql-request
 
-Simple GraphQL client and hook for Qwik applications.
+Simple GraphQL client and hook for [Qwik](https://github.com/BuilderIO/qwik) applications.
 
 [![npm version](https://badge.fury.io/js/qwik-graphql-client.svg)](https://badge.fury.io/js/qwik-graphql-client)
 
-- [qwik-graphql-request](#qwik-graphql-request)
-  - [Highlights](#highlights)
-  - [Installation](#installation)
-  - [Qwik Start](#qwik-start)
-  - [Examples](#examples)
-    - [Provide Context To Entire Application](#provide-context-to-entire-application)
-    - [Using Client without context provider](#using-client-without-context-provider)
-    - [Passing in default headers and middleware to the client](#passing-in-default-headers-and-middleware-to-the-client)
-  - [Contributing](#contributing)
-    - [Contributors](#contributors)
+ - [Highlights](#highlights)
+ - [Installation](#installation)
+ - [Qwik Start](#qwik-start)
+ - [Examples](#examples)
+   - [Provide Context To Entire Application](#provide-context-to-entire-application)
+   - [Using Client without context provider](#using-client-without-context-provider)
+   - [Passing in default headers and middleware to the client](#passing-in-default-headers-and-middleware-to-the-client)
+ - [Contributing](#contributing)
+   - [Contributors](#contributors)
 
 ## Highlights
 
@@ -72,7 +71,12 @@ export default component$(() => {
   const hero = useResource$(async () => await executeQuery$());
 
   return (
-    <Resource value={hero} onResolve={() => <div>{hero.name}</div>} onPending={...} onError={...} />
+    <Resource
+      value={hero}
+      onResolved={(value) => <div>{value.name}</div>}
+      onPending={...}
+      onRejected={...}
+    />
   )
 });
 ```
@@ -89,7 +93,7 @@ import { GraphQLClientProvider } from "qwik-graphql-client";
 export default component$(() => {
   return (
     <QwikCityProvider>
-      <head>// ...</head>
+      <head>...</head>
       <body>
         <GraphQLClientProvider endpoint="http://localhost:2003/graphql">
           <RouterOutlet />
