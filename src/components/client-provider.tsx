@@ -79,6 +79,7 @@ export class QwikGraphQLClient {
     const baseRequestConfig = {
       ...requestConfig,
       responseMiddleware: undefined,
+      fetch,
     };
 
     this.client = new GraphQLClient(url, baseRequestConfig as RequestConfig);
