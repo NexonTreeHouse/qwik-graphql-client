@@ -13,7 +13,6 @@ import type {
   ErrorPolicy,
   GraphQLClientRequestHeaders,
   HTTPMethodInput,
-  MaybeLazy,
   RequestConfig,
   RequestMiddleware,
   Variables,
@@ -26,7 +25,7 @@ type ClientContext = {
 
 export const ClientContext = createContextId<ClientContext>("graphql.client");
 
-type MaybeLazy$<T> = QRL<MaybeLazy<T>>;
+type MaybeLazy$<T> = T | QRL<() => T>;
 
 type RequestMiddleware$ = QRL<RequestMiddleware>;
 
@@ -43,7 +42,7 @@ interface QwikGraphqlClientRequestConfig
   extends Omit<RequestInit, "headers" | "method" | "body" | "signal">,
     AdditionalRequestOptions {
   method?: HTTPMethodInput;
-  headers?: MaybeLazy$<GraphQLClientRequestHeaders>;
+  headers?: MaybeLazy$<string[][] | Record<string, string>>;
   requestMiddleware?: RequestMiddleware$;
   responseMiddleware?: ResponseMiddleware$;
 }
