@@ -2,7 +2,7 @@
 
 Simple GraphQL client and hook for [Qwik](https://github.com/BuilderIO/qwik) applications.
 
-[![npm version](https://badge.fury.io/js/qwik-graphql-client.svg)](https://badge.fury.io/js/qwik-graphql-client)
+[![npm version](https://badge.fury.io/js/qwik-graphql-client.svg?kill_cache=1)](https://badge.fury.io/js/qwik-graphql-client)
 
  - [Highlights](#highlights)
  - [Installation](#installation)
@@ -154,5 +154,5 @@ Contributions are welcome, please open an issue and/or create a pull request.
 ### Contributors
 
 <a href="https://github.com/nexontreehouse/qwik-graphql-client/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=nexontreehouse/qwik-graphql-client" />
+  <img src="https://contrib.rocks/image?repo=nexontreehouse/qwik-graphql-client&kill_cache=1" />
 </a>
