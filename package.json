@@ -61,7 +61,7 @@
     "vite": "4.3.5"
   },
   "dependencies": {
-    "graphql": "^16.6.0",
-    "graphql-request": "^6.0.0"
+    "@apollo/client": "^3.7.14",
+    "graphql": "^16.6.0"
   }
 }
