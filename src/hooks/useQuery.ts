@@ -1,41 +1,87 @@
-import { useContext, $ } from "@builder.io/qwik";
-import { type RequestDocument, type Variables } from "graphql-request";
-import { ClientContext } from "../components/client-provider";
-import { type TypedDocumentNode } from "@graphql-typed-document-node/core";
+import {
+  ApolloClient,
+  ApolloError,
+  DocumentNode,
+  OperationVariables,
+  TypedDocumentNode,
+  WatchQueryFetchPolicy,
+  gql,
+} from "@apollo/client/core";
+import { QRL, ResourceReturn, useResource$ } from "@builder.io/qwik";
 import { print } from "graphql";
+import { QueryFunctionOptions as ApolloQueryHookOptions } from "@apollo/client";
+import { useApolloClient } from "..";
+// import { isServer } from "@builder.io/qwik/build";
 
-export default function useQuery<T = unknown, V extends Variables = Variables>(
-  query: RequestDocument | TypedDocumentNode<T, V>
-) {
-  const clientContext = useContext(ClientContext);
+export type QueryHookOptions<
+  TData,
+  TVariables extends OperationVariables
+> = Omit<
+  ApolloQueryHookOptions<TData, TVariables>,
+  | "variables"
+  | "nextFetchPolicy"
+  | "onCompleted"
+  | "onError"
+  | "defaultOptions"
+  | "client"
+  | "ssr"
+  | "skip"
+> & {
+  nextFetchPolicy?: WatchQueryFetchPolicy;
+  onCompleted$?: QRL<(data: TData) => void>;
+  onError$?: QRL<(error: ApolloError) => void>;
+  clientMaker$?: QRL<() => ApolloClient<any>>;
+};
 
-  let queryString: string;
-  if (typeof query === "string") {
-    queryString = query;
-  } else {
-    queryString = print(query);
-  }
+export function useQuery<T, V extends OperationVariables>(
+  query: DocumentNode | TypedDocumentNode<T, V>,
+  variables: V,
+  options?: QueryHookOptions<T, V>
+): ResourceReturn<T> | undefined {
+  const ctx = useApolloClient();
 
-  const executeQuery$ = $(
-    async (
-      config?: Partial<{
-        variables: V;
-        signal: AbortSignal;
-        headers: Headers;
-      }>
-    ) => {
-      try {
-        return await clientContext.client!.request<T>(
-          queryString,
-          config?.variables,
-          config?.headers,
-          config?.signal
-        );
-      } catch (error) {
-        return Promise.reject(error);
-      }
+  const queryString = print(query);
+
+  return useResource$<T>(async ({ track, cleanup }) => {
+    if (variables) track(variables);
+
+    const client = options?.clientMaker$
+      ? await options.clientMaker$()
+      : ctx.client;
+    if (!client) {
+      throw new Error("No client");
     }
-  );
 
-  return { executeQuery$ };
+    const observable = client!.watchQuery<T, V>({
+      query: gql`
+        ${queryString}
+      `,
+      variables,
+      ...options,
+    });
+
+    let resolved = false;
+    return new Promise((resolve, reject) => {
+      const sub = observable.subscribe({
+        error: (error) => {
+          if (options?.onError$) options.onError$(error);
+          reject(error);
+        },
+        next: ({ data, error }) => {
+          if (error) {
+            if (options?.onError$) options.onError$(error);
+            reject(error);
+          }
+
+          if (!resolved) {
+            resolved = true;
+            if (options?.onCompleted$) options.onCompleted$(data);
+            resolve(data);
+          }
+        },
+      });
+
+      cleanup(() => sub.unsubscribe());
+    });
+  });
 }

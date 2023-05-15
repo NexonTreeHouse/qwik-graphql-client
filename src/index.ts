@@ -1,12 +1,7 @@
-import ClientProvider, {
-  QwikGraphQLClient,
-} from "./components/client-provider";
-import useQuery from "./hooks/useQuery";
-import { gql } from "graphql-request";
-
+export { ApolloClient } from "@apollo/client/core";
 export {
-  useQuery,
-  ClientProvider as GraphQLClientProvider,
-  QwikGraphQLClient,
-  gql,
-};
+  GraphQLClientProvider,
+  useGraphQLClientContext as useApolloClient,
+} from "./components/provider/qwik-graphql-client";
+export { useQuery, type QueryHookOptions } from "./hooks/useQuery";
+export { useLazyQuery } from "./hooks/useLazyQuery";
