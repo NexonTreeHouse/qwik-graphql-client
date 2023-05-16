@@ -13,6 +13,8 @@ import { QueryFunctionOptions as ApolloQueryHookOptions } from "@apollo/client";
 import { useApolloClient } from "..";
 // import { isServer } from "@builder.io/qwik/build";
 
+export type ClientMaker = QRL<() => ApolloClient<any>>;
+
 export type QueryHookOptions<
   TData,
   TVariables extends OperationVariables
@@ -30,7 +32,7 @@ export type QueryHookOptions<
   nextFetchPolicy?: WatchQueryFetchPolicy;
   onCompleted$?: QRL<(data: TData) => void>;
   onError$?: QRL<(error: ApolloError) => void>;
-  clientMaker$?: QRL<() => ApolloClient<any>>;
+  clientMaker$?: ClientMaker;
 };
 
 export function useQuery<T, V extends OperationVariables>(
