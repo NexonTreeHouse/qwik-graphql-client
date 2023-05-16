@@ -1,32 +1,41 @@
 import {
+  ApolloError,
   DefaultContext,
   DocumentNode,
+  InternalRefetchQueriesInclude,
   OperationVariables,
   TypedDocumentNode,
   gql,
 } from "@apollo/client/core";
 import { print } from "graphql";
 import { useGraphQLClientContext } from "../components/provider/qwik-graphql-client";
-import { MutationHookOptions as ApolloMutationHookOptions } from "@apollo/client";
-import { QRL, $ } from "@builder.io/qwik";
+import { BaseMutationOptions } from "@apollo/client";
+import { QRL, $, useSignal } from "@builder.io/qwik";
+import { ClientMaker } from "./useQuery";
 
 type MutationHookOptions<
   TData,
   TVariables extends OperationVariables,
   TContext extends DefaultContext = {}
 > = Omit<
-  ApolloMutationHookOptions<TData, TVariables, TContext>,
-  | "mutation"
+  BaseMutationOptions<TData, TVariables, TContext>,
   | "variables"
+  | "client"
+  // done - ^
   | "optimisticResponse"
   | "refetchQueries"
-  | "update"
-  | "onQueryUpdated"
-  | "client"
   | "onCompleted"
   | "onError"
+  // todo - test if this actually works^
+  | "update"
+  | "onQueryUpdated"
+  // ! not implemented^
 > & {
   optimisticResponse$?: TData | QRL<(vars: TVariables) => TData>;
+  refetchQueries$?: InternalRefetchQueriesInclude;
+  clientMaker$?: ClientMaker;
+  onCompleted$?: QRL<(data: TData) => void>;
+  onError$?: QRL<(error: ApolloError) => void>;
 };
 
 export const useMutation = async <
@@ -39,25 +48,39 @@ export const useMutation = async <
 ) => {
   const ctx = useGraphQLClientContext();
 
+  const data = useSignal<Promise<TData> | undefined>();
+
   const mutationString = print(mutation);
 
   const executeMutation$ = $(async (variables: TVariables) => {
-    const client = ctx.client;
+    const client = options?.clientMaker$
+      ? await options.clientMaker$()
+      : ctx.client;
+    if (!client) {
+      throw new Error("No client");
+    }
 
+    // todo! - test if this actually works
     if (typeof options?.optimisticResponse$ === "function") {
       options.optimisticResponse$ = await (
         options.optimisticResponse$ as QRL<(vars: TVariables) => TData>
       )(variables);
     }
 
-    client?.mutate<TData, TVariables, TContext>({
+    const mutation = await client.mutate<TData, TVariables, TContext>({
       mutation: gql`
         ${mutationString}
       `,
       variables,
       ...options,
     });
+
+    if (mutation.data) {
+      data.value = Promise.resolve(mutation.data);
+    } else {
+      data.value = Promise.reject(mutation.errors);
+    }
   });
 
-  return { executeMutation$ };
+  return { executeMutation$, data };
 };
