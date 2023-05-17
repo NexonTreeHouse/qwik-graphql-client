@@ -9,18 +9,20 @@ import { GraphQLClientProvider, ApolloClient } from ".";
 
 import { Resource, $, useStore } from "@builder.io/qwik";
 import { component$ } from "@builder.io/qwik";
-import { useLazyQuery } from "./hooks/useLazyQuery";
+import { useMutation } from "./hooks/useMutation";
 
 export default () => {
   const clientMaker$ = $(() => {
     const httpLink = new HttpLink({
-      uri: "https://countries.trevorblades.com/graphql",
+      uri: "https://tradition-non-license-individually.trycloudflare.com/graphql",
     });
     const middleware = new ApolloLink((operation, forward) => {
+      console.log("operation", operation);
       return forward(operation);
     });
 
     const requestMiddleware = new ApolloLink((operation, forward) => {
+      console.log("request", operation);
       return forward(operation);
     });
 
@@ -47,14 +49,30 @@ export default () => {
 
 export const Child = component$(() => {
   const variables = useStore({ code: "US" });
-  const { executeQuery$, data } = useLazyQuery(gql`
-    query Country($code: ID!) {
-      country(code: $code) {
-        name
-        capital
+  const { executeMutation$, data } = useMutation<string, {}>(
+    gql`
+      mutation x {
+        createHuman(
+          newHuman: {
+            name: "Zara Calder-Marshall"
+            appearsIn: "JEDI"
+            homePlanet: "Uranus"
+          }
+        ) {
+          name
+          homePlanet
+        }
       }
+    `,
+    {
+      onError$: $((e) => {
+        console.log(JSON.stringify(e, null, 2));
+      }),
+      onCompleted$: $((data) => {
+        console.log(data);
+      }),
     }
-  `);
+  );
 
   return (
     <div style={{ fontSize: "2rem" }}>
@@ -66,7 +84,7 @@ export const Child = component$(() => {
       <button
         style={{ fontSize: "2rem", margin: "em" }}
         onClick$={() => {
-          executeQuery$(variables);
+          executeMutation$(variables);
         }}
       >
         Fetch

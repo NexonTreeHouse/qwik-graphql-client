@@ -66,18 +66,23 @@ export function useQuery<T, V extends OperationVariables>(
     return new Promise((resolve, reject) => {
       const sub = observable.subscribe({
         error: (error) => {
-          if (options?.onError$) options.onError$(error);
+          options?.onError$?.(error);
+
           reject(error);
         },
         next: ({ data, error }) => {
           if (error) {
-            if (options?.onError$) options.onError$(error);
+            options?.onError$?.(error);
+            if (options?.errorPolicy === "ignore") {
+              options?.onCompleted$ && options.onCompleted$(data);
+              resolve(data);
+            }
             reject(error);
           }
 
           if (!resolved) {
             resolved = true;
-            if (options?.onCompleted$) options.onCompleted$(data);
+            options?.onCompleted$ && options.onCompleted$(data);
             resolve(data);
           }
         },

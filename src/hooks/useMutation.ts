@@ -10,7 +10,7 @@ import {
 import { print } from "graphql";
 import { useGraphQLClientContext } from "../components/provider/qwik-graphql-client";
 import { BaseMutationOptions } from "@apollo/client";
-import { QRL, $, useSignal } from "@builder.io/qwik";
+import { QRL, $, useSignal, Signal } from "@builder.io/qwik";
 import { ClientMaker } from "./useQuery";
 
 type MutationHookOptions<
@@ -35,17 +35,19 @@ type MutationHookOptions<
   refetchQueries$?: InternalRefetchQueriesInclude;
   clientMaker$?: ClientMaker;
   onCompleted$?: QRL<(data: TData) => void>;
-  onError$?: QRL<(error: ApolloError) => void>;
+  onError$?: QRL<
+    (error: ApolloError, clientOptions?: BaseMutationOptions) => void
+  >;
 };
 
-export const useMutation = async <
+export const useMutation = <
   TData,
   TVariables extends OperationVariables,
   TContext extends DefaultContext = {}
 >(
   mutation: DocumentNode | TypedDocumentNode<TData, TVariables>,
   options?: MutationHookOptions<TData, TVariables, TContext>
-) => {
+): UseMutationReturn<TData, TVariables> => {
   const ctx = useGraphQLClientContext();
 
   const data = useSignal<Promise<TData> | undefined>();
@@ -67,20 +69,59 @@ export const useMutation = async <
       )(variables);
     }
 
-    const mutation = await client.mutate<TData, TVariables, TContext>({
-      mutation: gql`
-        ${mutationString}
-      `,
-      variables,
-      ...options,
-    });
+    data.value = new Promise<TData>((resolve, reject) => {
+      const mutation = client.mutate<TData, TVariables, TContext>({
+        mutation: gql`
+          ${mutationString}
+        `,
+        variables,
+        ...options,
+        optimisticResponse: options?.optimisticResponse$ as TData | undefined,
+      });
 
-    if (mutation.data) {
-      data.value = Promise.resolve(mutation.data);
-    } else {
-      data.value = Promise.reject(mutation.errors);
-    }
+      mutation
+        .then(async (result) => {
+          if (result.data) {
+            if (result.errors) {
+              options?.onError$ &&
+                (await options.onError$(
+                  new ApolloError({ graphQLErrors: result.errors }),
+                  options
+                ));
+
+              if (options?.errorPolicy !== "ignore") reject(result.errors);
+            }
+
+            options?.onCompleted$ && (await options.onCompleted$(result.data));
+            resolve(result.data);
+          }
+
+          if (result.errors) {
+            options?.onError$ &&
+              (await options.onError$(
+                new ApolloError({ graphQLErrors: result.errors }),
+                options
+              ));
+            reject(result.errors);
+          }
+
+          options?.onError$ &&
+            (await options.onError$(
+              new ApolloError({ graphQLErrors: result.errors }),
+              options
+            ));
+          reject(result.errors);
+        })
+        .catch(async (error) => {
+          options?.onError$ && (await options.onError$(error, options));
+          reject(error);
+        });
+    });
   });
 
   return { executeMutation$, data };
+};
+export type UseMutationReturn<TData, TVariables> = {
+  executeMutation$: QRL<(variables: TVariables) => Promise<void>>;
+  data: Signal<Promise<TData> | undefined>;
 };
