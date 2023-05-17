@@ -39,22 +39,27 @@ export const useLazyQuery = <T, V extends OperationVariables>(
     });
 
     let resolved = false;
-    data.value = new Promise<T>((resolve, reject) => {
+    data.value = new Promise((resolve, reject) => {
       observable.subscribe({
         error: (error) => {
-          if (options?.onError$) options.onError$(error);
+          options?.onError$?.(error);
           reject(error);
         },
-        next: (result) => {
-          if (result.error) {
-            if (options?.onError$) options.onError$(result.error);
-            reject(result.error);
+        next: ({ data, error }) => {
+          if (error) {
+            options?.onError$?.(error);
+            if (options?.errorPolicy === "ignore") {
+              options?.onCompleted$?.(data);
+              resolve(data);
+            }
+            reject(error);
           }
 
           if (!resolved) {
             resolved = true;
-            if (options?.onCompleted$) options.onCompleted$(result.data);
-            resolve(result.data);
+
+            options?.onCompleted$?.(data);
+            resolve(data);
           }
         },
       });
