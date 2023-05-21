@@ -57,7 +57,6 @@ export const useLazyQuery = <T, V extends OperationVariables>(
 
           if (!resolved) {
             resolved = true;
-
             options?.onCompleted$?.(data);
             resolve(data);
           }
