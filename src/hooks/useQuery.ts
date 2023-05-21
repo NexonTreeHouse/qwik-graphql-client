@@ -74,7 +74,7 @@ export function useQuery<T, V extends OperationVariables>(
           if (error) {
             options?.onError$?.(error);
             if (options?.errorPolicy === "ignore") {
-              options?.onCompleted$ && options.onCompleted$(data);
+              options?.onCompleted$?.(data);
               resolve(data);
             }
             reject(error);
@@ -82,7 +82,7 @@ export function useQuery<T, V extends OperationVariables>(
 
           if (!resolved) {
             resolved = true;
-            options?.onCompleted$ && options.onCompleted$(data);
+            options?.onCompleted$?.(data);
             resolve(data);
           }
         },
