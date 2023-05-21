@@ -11,9 +11,8 @@ import { QRL, ResourceReturn, useResource$ } from "@builder.io/qwik";
 import { print } from "graphql";
 import { QueryFunctionOptions as ApolloQueryHookOptions } from "@apollo/client";
 import { useApolloClient } from "..";
-// import { isServer } from "@builder.io/qwik/build";
 
-export type ClientMaker = QRL<() => ApolloClient<any>>;
+export type ClientGenerator = QRL<() => ApolloClient<any>>;
 
 export type QueryHookOptions<
   TData,
@@ -33,7 +32,7 @@ export type QueryHookOptions<
   nextFetchPolicy?: WatchQueryFetchPolicy;
   onCompleted$?: QRL<(data: TData) => void>;
   onError$?: QRL<(error: ApolloError) => void>;
-  clientGenerator$?: ClientMaker;
+  clientGenerator$?: ClientGenerator;
 };
 
 export function useQuery<T, V extends OperationVariables>(
