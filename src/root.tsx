@@ -1,5 +1,10 @@
-import { ApolloClient, InMemoryCache, gql, useQuery } from ".";
-import { GraphQLClientProvider } from "./components/provider/qwik-graphql-client";
+import {
+  ApolloClient,
+  InMemoryCache,
+  gql,
+  useQuery,
+  GraphQLClientProvider,
+} from ".";
 import { $, Resource, component$, useStore } from "@builder.io/qwik";
 
 export default () => {
@@ -15,6 +20,9 @@ export default () => {
             return new ApolloClient({
               cache: new InMemoryCache(),
               uri: "https://countries.trevorblades.com/graphql",
+              headers: {
+                Authorization: "Bearer 123",
+              },
             });
           })}
         >

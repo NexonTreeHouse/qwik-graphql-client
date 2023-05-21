@@ -11,7 +11,7 @@ import { print } from "graphql";
 import { useGraphQLClientContext } from "../components/provider/qwik-graphql-client";
 import { BaseMutationOptions } from "@apollo/client";
 import { QRL, $, useSignal, Signal } from "@builder.io/qwik";
-import { ClientMaker } from "./useQuery";
+import { ClientGenerator } from "./useQuery";
 
 type MutationHookOptions<
   TData,
@@ -33,7 +33,7 @@ type MutationHookOptions<
 > & {
   optimisticResponse$?: TData | QRL<(vars: TVariables) => TData>;
   refetchQueries$?: InternalRefetchQueriesInclude;
-  clientMaker$?: ClientMaker;
+  clientMaker$?: ClientGenerator;
   onCompleted$?: QRL<(data: TData) => void>;
   onError$?: QRL<
     (error: ApolloError, clientOptions?: BaseMutationOptions) => void
