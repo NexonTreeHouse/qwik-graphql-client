@@ -23,8 +23,8 @@ export const useLazyQuery = <T, V extends OperationVariables>(
   const data = useSignal<Promise<T> | undefined>(undefined);
 
   const executeQuery$ = $(async (variables: V) => {
-    const client = options?.clientMaker$
-      ? await options.clientMaker$()
+    const client = options?.clientGenerator$
+      ? await options.clientGenerator$()
       : ctx.client;
     if (!client) {
       throw new Error("No client");

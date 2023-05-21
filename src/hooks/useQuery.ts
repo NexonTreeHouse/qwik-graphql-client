@@ -28,27 +28,28 @@ export type QueryHookOptions<
   | "client"
   | "ssr"
   | "skip"
+  | "returnPartialData"
 > & {
   nextFetchPolicy?: WatchQueryFetchPolicy;
   onCompleted$?: QRL<(data: TData) => void>;
   onError$?: QRL<(error: ApolloError) => void>;
-  clientMaker$?: ClientMaker;
+  clientGenerator$?: ClientMaker;
 };
 
 export function useQuery<T, V extends OperationVariables>(
   query: DocumentNode | TypedDocumentNode<T, V>,
   variables: V,
   options?: QueryHookOptions<T, V>
-): ResourceReturn<T> | undefined {
+): ResourceReturn<T> {
   const ctx = useApolloClient();
 
   const queryString = print(query);
 
   return useResource$<T>(async ({ track, cleanup }) => {
-    if (variables) track(variables);
+    track(variables);
 
-    const client = options?.clientMaker$
-      ? await options.clientMaker$()
+    const client = options?.clientGenerator$
+      ? await options.clientGenerator$()
       : ctx.client;
     if (!client) {
       throw new Error("No client");
