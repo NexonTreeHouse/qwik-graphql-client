@@ -1,4 +1,4 @@
-export { ApolloClient } from "@apollo/client/core";
+export { ApolloClient, InMemoryCache, gql } from "@apollo/client/core";
 export {
   GraphQLClientProvider,
   useGraphQLClientContext as useApolloClient,
