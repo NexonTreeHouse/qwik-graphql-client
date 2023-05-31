@@ -12,3 +12,4 @@ export {
 } from "./components/provider/qwik-graphql-client";
 export { useQuery, type QueryHookOptions } from "./hooks/useQuery";
 export { useLazyQuery } from "./hooks/useLazyQuery";
+export { useMutation } from "./hooks/useMutation";
