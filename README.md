@@ -12,6 +12,7 @@ Simple GraphQL client and hook for [Qwik](https://qwik.builder.io/) applications
   - [Using a Client Without the Context Provider](#using-a-client-without-the-context-provider)
   - [Using useLazyQuery](#using-uselazyquery)
   - [Passing in default headers and middleware to the client](#passing-in-default-headers-and-middleware-to-the-client)
+  - [Enabling Apollo Client Devtools](#enabling-apollo-client-devtools)
 - [Limitations](#limitations)
 - [Contributing](#contributing)
   - [Contributors](#contributors)
@@ -224,7 +225,7 @@ export default component$(() => {
     });
 
     const responseMiddleware = new ApolloLink((operation, forward) => {
-        console.log("response, operation);
+        console.log("response", operation);
         return forward(operation);
       });
 
