@@ -247,6 +247,21 @@ export default component$(() => {
 });
 ```
 
+
+### Enabling Apollo Client Devtools
+
+To enable linking to the Apollo Client Devtools browser extension ([Chrome](https://chrome.google.com/webstore/detail/apollo-client-devtools/jdkknkkbebbapilgoeccciglkfbmbnfm), [Firefox](https://addons.mozilla.org/en-US/firefox/addon/apollo-developer-tools)), add the following line to the Apollo Client returned from the `clientGenerator$`.
+
+```tsx
+new ApolloClient({
+  // Enable in development only.
+  connectToDevTools: import.meta.env.DEV,
+  // Enable always.
+  connectToDevTools: true,
+  ...
+});
+```
+
 ## Limitations
 
 While this library is built on top of Apollo Client Core and the Apollo Client [docs](https://www.apollographql.com/docs/react/) can be used for further documentation, this package does not support all of the features and some features are likely not to work as expected. This is very much a work in progress. If you find a bug or would like to see a feature added please open an issue or create a pull request.
