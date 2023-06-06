@@ -1,6 +1,6 @@
 {
   "name": "qwik-graphql-client",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Introducing the Qwik GraphQL Client - the coolest cat on the block when it comes to consuming GraphQL APIs! This package is the ultimate wingman for your Qwik projects, giving you all the tools you need to easily retrieve data from GraphQL servers",
   "license": "MIT",
   "repository": "github:NexonTreeHouse/qwik-graphql-client",
@@ -49,19 +49,19 @@
     "@builder.io/qwik": "1.1.0",
     "@graphql-typed-document-node/core": "^3.2.0",
     "@types/eslint": "8.37.0",
-    "@types/node": "^20.1.2",
+    "@types/node": "^20.2.5",
     "@typescript-eslint/eslint-plugin": "5.59.2",
     "@typescript-eslint/parser": "5.59.2",
     "eslint": "8.40.0",
-    "eslint-plugin-qwik": "^1.1.1",
+    "eslint-plugin-qwik": "^1.1.4",
     "np": "7.6.1",
     "prettier": "2.8.8",
     "typescript": "5.0.4",
     "undici": "5.22.0",
-    "vite": "4.3.5"
+    "vite": "4.3.9"
   },
   "dependencies": {
-    "@apollo/client": "^3.7.14",
+    "@apollo/client": "^3.7.15",
     "graphql": "^16.6.0"
   }
 }
