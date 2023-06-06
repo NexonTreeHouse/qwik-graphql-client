@@ -74,21 +74,26 @@ Then in child components you can use the `useQuery` hook to make GraphQL request
 import { useQuery, gql } from "qwik-graphql-client";
 
 export default component$(() => {
-  const hero = useQuery(
+  const variables = useStore({
+    artistID: "1",
+  });
+
+  const artist = useQuery(
     gql`
-      query GetCapital($episode: Episode!) {
-        hero(episode: $episode) {
+      query GetArtist($artistID: ID!) {
+        artist(artistID: $artistID) {
+          stageName
           name
         }
       }
     `,
-    { variables: { episode: "JEDI" } }
+    variables
   );
 
   return (
     <Resource
-      value={hero}
-      onResolved={(value) => <div>{value.name}</div>}
+      value={artist}
+      onResolved={(value) => <pre>{artist.stageName}</pre>}
       onPending={...}
       onRejected={...}
     />
@@ -143,16 +148,17 @@ import {
   InMemoryCache,
 } from "qwik-graphql-client";
 
-export const useHero = (episode: Episode) => {
+export const useHero = (artistID: string) => {
   return useQuery(
     gql`
-      query GetHero($episode: Episode!) {
-        hero(episode: $episode) {
+      query GetArtist($artistID: ID!) {
+        artist(artistID: $artistID) {
+          stageName
           name
         }
       }
     `,
-    { variables: { episode } },
+    { artistID },
     {
       clientGenerator$: $(
         () =>
@@ -176,13 +182,51 @@ import { useLazyQuery, gql } from "qwik-graphql-client";
 export default component$(() => {
   const {executeQuery$, data} = useLazyQuery(
     gql`
-      query GetHero($episode: Episode!) {
-        hero(episode: $episode) {
+      query GetArtist($artistID: ID!) {
+        artist(artistID: $artistID) {
+          stageName
           name
         }
       }
     `,
-    { variables: { episode: "JEDI" } }
+    { artistID: "1" }
+  );
+
+  return (
+    <div>
+      <button onClick={() => executeQuery()}>Get Hero</button>
+      <Resource
+        value={data}
+        onResolved={(value) => <div>{value.stageName}</div>}
+        onPending={...}
+        onRejected={...}
+      />
+    </div>
+})
+```
+
+### Using `useMutation`
+
+The `useMutation` hook allows creating mutations to graphql servers. It works the similar to the `useLazyQuery` hook in that it returns a function that can be called to execute the mutation.
+
+```tsx
+import { useLazyQuery, gql } from "qwik-graphql-client";
+
+export default component$(() => {
+  const variables = useStore({
+    name: "Stefani Joanne Angelina Germanotta",
+    stageName: "Lady Gaga"
+  })
+
+  const {executeQuery$, data} = useLazyQuery(
+    gql`
+      mutation AddArtist($name: String!, $stageName: String!) {
+        hero(name: $name, stageName: $stageName) {
+          id
+        }
+      },
+      variables
+    `,
   );
 
   return (
@@ -218,16 +262,15 @@ export default component$(() => {
       uri: "http://localhost:2003/graphql",
     });
 
-
     const requestMiddleware = new ApolloLink((operation, forward) => {
       console.log("request", operation);
       return forward(operation);
     });
 
     const responseMiddleware = new ApolloLink((operation, forward) => {
-        console.log("response", operation);
-        return forward(operation);
-      });
+      console.log("response", operation);
+      return forward(operation);
+    });
 
     return new ApolloClient({
       cache: new InMemoryCache(),
@@ -239,15 +282,12 @@ export default component$(() => {
   });
 
   return (
-    <GraphQLClientProvider
-     clientGenerator$={clientGenerator$}
-    >
+    <GraphQLClientProvider clientGenerator$={clientGenerator$}>
       <Slot />
     </GraphQLClientProvider>
   );
 });
 ```
-
 
 ### Enabling Apollo Client Devtools
 
