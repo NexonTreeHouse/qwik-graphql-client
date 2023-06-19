@@ -32,7 +32,6 @@ export type QueryHookOptions<
   nextFetchPolicy?: WatchQueryFetchPolicy;
   onCompleted$?: QRL<(data: TData) => void>;
   onError$?: QRL<(error: ApolloError) => void>;
-  clientGenerator$?: ClientGenerator;
 };
 
 export function useQuery<T, V extends OperationVariables>(
@@ -47,9 +46,7 @@ export function useQuery<T, V extends OperationVariables>(
   return useResource$<T>(async ({ track, cleanup }) => {
     track(variables);
 
-    const client = options?.clientGenerator$
-      ? await options.clientGenerator$()
-      : ctx.client;
+    const client = ctx.client;
     if (!client) {
       throw new Error("No client");
     }

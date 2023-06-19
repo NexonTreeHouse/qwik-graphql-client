@@ -2,6 +2,7 @@ import {
   ApolloError,
   DefaultContext,
   DocumentNode,
+  FetchResult,
   InternalRefetchQueriesInclude,
   OperationVariables,
   TypedDocumentNode,
@@ -33,6 +34,10 @@ type MutationHookOptions<
 > & {
   optimisticResponse$?: TData | QRL<(vars: TVariables) => TData>;
   refetchQueries$?: InternalRefetchQueriesInclude;
+  clientGenerator$?: ClientGenerator;
+  /**
+   * @deprecated This method has been renamed to `clientGenerator$` in line with other hooks, please use that instead.
+   */
   clientMaker$?: ClientGenerator;
   onCompleted$?: QRL<(data: TData) => void>;
   onError$?: QRL<
@@ -48,16 +53,44 @@ export const useMutation = <
   mutation: DocumentNode | TypedDocumentNode<TData, TVariables>,
   options?: MutationHookOptions<TData, TVariables, TContext>
 ): UseMutationReturn<TData, TVariables> => {
-  const ctx = useGraphQLClientContext();
-
   const data = useSignal<Promise<TData> | undefined>();
-
   const mutationString = print(mutation);
 
+  if (options?.clientGenerator$ || options?.clientMaker$) {
+    const executeMutation$ = $(async (variables: TVariables) => {
+      const client =
+        (await options.clientGenerator$?.()) ??
+        (await options.clientMaker$?.());
+
+      if (!client) {
+        throw new Error("No client");
+      }
+
+      // todo! - test if this actually works
+      if (typeof options?.optimisticResponse$ === "function") {
+        options.optimisticResponse$ = await (
+          options.optimisticResponse$ as QRL<(vars: TVariables) => TData>
+        )(variables);
+      }
+
+      const mutation = client!.mutate<TData, TVariables, TContext>({
+        mutation: gql`
+          ${mutationString}
+        `,
+        variables,
+        ...options,
+      });
+
+      data.value = setData<TData, TVariables, TContext>(mutation, options);
+    });
+
+    return { executeMutation$, data };
+  }
+
+  const ctx = useGraphQLClientContext();
+
   const executeMutation$ = $(async (variables: TVariables) => {
-    const client = options?.clientMaker$
-      ? await options.clientMaker$()
-      : ctx.client;
+    const client = ctx.client;
     if (!client) {
       throw new Error("No client");
     }
@@ -69,59 +102,70 @@ export const useMutation = <
       )(variables);
     }
 
-    data.value = new Promise<TData>((resolve, reject) => {
-      const mutation = client.mutate<TData, TVariables, TContext>({
-        mutation: gql`
-          ${mutationString}
-        `,
-        variables,
-        ...options,
-        optimisticResponse: options?.optimisticResponse$ as TData | undefined,
-      });
+    const mutation = client!.mutate<TData, TVariables, TContext>({
+      mutation: gql`
+        ${mutationString}
+      `,
+      variables,
+      ...options,
+    });
 
-      mutation
-        .then(async (result) => {
-          if (result.data) {
-            if (result.errors) {
-              options?.onError$ &&
-                (await options.onError$(
-                  new ApolloError({ graphQLErrors: result.errors }),
-                  options
-                ));
+    data.value = setData<TData, TVariables, TContext>(mutation, options);
+  });
 
-              if (options?.errorPolicy !== "ignore") reject(result.errors);
-            }
+  return { executeMutation$, data };
+};
 
-            options?.onCompleted$ && (await options.onCompleted$(result.data));
-            resolve(result.data);
-          }
+export type UseMutationReturn<TData, TVariables> = {
+  executeMutation$: QRL<(variables: TVariables) => Promise<void>>;
+  data: Signal<Promise<TData> | undefined>;
+};
 
+const setData = <
+  TData,
+  TVariables extends OperationVariables,
+  TContext extends DefaultContext = {}
+>(
+  mutation: Promise<FetchResult<TData>>,
+  options?: MutationHookOptions<TData, TVariables, TContext>
+) => {
+  return new Promise<TData>((resolve, reject) => {
+    mutation
+      .then(async (result) => {
+        if (result.data) {
           if (result.errors) {
             options?.onError$ &&
               (await options.onError$(
                 new ApolloError({ graphQLErrors: result.errors }),
                 options
               ));
-            reject(result.errors);
+
+            if (options?.errorPolicy !== "ignore") reject(result.errors);
           }
 
+          options?.onCompleted$ && (await options.onCompleted$(result.data));
+          resolve(result.data);
+        }
+
+        if (result.errors) {
           options?.onError$ &&
             (await options.onError$(
               new ApolloError({ graphQLErrors: result.errors }),
               options
             ));
           reject(result.errors);
-        })
-        .catch(async (error) => {
-          options?.onError$ && (await options.onError$(error, options));
-          reject(error);
-        });
-    });
-  });
+        }
 
-  return { executeMutation$, data };
-};
-export type UseMutationReturn<TData, TVariables> = {
-  executeMutation$: QRL<(variables: TVariables) => Promise<void>>;
-  data: Signal<Promise<TData> | undefined>;
+        options?.onError$ &&
+          (await options.onError$(
+            new ApolloError({ graphQLErrors: result.errors }),
+            options
+          ));
+        reject(result.errors);
+      })
+      .catch(async (error) => {
+        options?.onError$ && (await options.onError$(error, options));
+        reject(error);
+      });
+  });
 };

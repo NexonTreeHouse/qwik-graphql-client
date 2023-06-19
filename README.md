@@ -55,12 +55,13 @@ import {
 export default component$(() => {
   return (
     <GraphQLClientProvider
-      clientGenerator$={() =>
-        new ApolloClient({
-          cache: new InMemoryCache(),
-          uri: "http://localhost:2003/graphql",
-        })
-      }
+      clientGenerator$={$(
+        () =>
+          new ApolloClient({
+            cache: new InMemoryCache(),
+            uri: "http://localhost:2003/graphql",
+          })
+      )}
     >
       <Slot />
     </GraphQLClientProvider>
@@ -139,7 +140,7 @@ export default component$(() => {
 
 ### Using a Client Without the Context Provider
 
-You can use a GraphQL a separate client independently of the context provider by passing a `clientGenerator$` function into hooks.
+You can use a GraphQL a separate client independently of the context provider by passing a `clientGenerator$` function into hooks. Note: This only works with `useLazyQuery` and `useMutation` hooks.
 
 ```tsx
 import {
@@ -149,7 +150,7 @@ import {
 } from "qwik-graphql-client";
 
 export const useHero = (artistID: string) => {
-  return useQuery(
+  return useLazyQuery(
     gql`
       query GetArtist($artistID: ID!) {
         artist(artistID: $artistID) {
