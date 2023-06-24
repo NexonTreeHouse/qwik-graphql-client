@@ -208,7 +208,7 @@ export default component$(() => {
 
 ### Using `useMutation`
 
-The `useMutation` hook allows creating mutations to graphql servers. It works the similar to the `useLazyQuery` hook in that it returns a function that can be called to execute the mutation.
+The `useMutation` hook allows creating mutations to graphql servers. It works similar to the `useLazyQuery` hook in that it returns a function that can be called to execute the mutation.
 
 ```tsx
 import { useLazyQuery, gql } from "qwik-graphql-client";
