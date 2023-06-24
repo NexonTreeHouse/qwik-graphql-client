@@ -175,7 +175,7 @@ export const useHero = (artistID: string) => {
 
 ### Using `useLazyQuery`
 
-The `useLazyQuery` hook is also available to use. It works the same as the `useQuery` hook except it does not automatically execute the query. Instead it returns a function that can be called to execute the query.
+The `useLazyQuery` hook is also available to use. It works the same as the `useQuery` hook except it does not automatically execute the query. Instead, it returns a function that can be called to execute the query.
 
 ```tsx
 import { useLazyQuery, gql } from "qwik-graphql-client";
