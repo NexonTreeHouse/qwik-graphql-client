@@ -211,7 +211,7 @@ export default component$(() => {
 The `useMutation` hook allows creating mutations to graphql servers. It works similar to the `useLazyQuery` hook in that it returns a function that can be called to execute the mutation.
 
 ```tsx
-import { useLazyQuery, gql } from "qwik-graphql-client";
+import { useMutation, gql } from "qwik-graphql-client";
 
 export default component$(() => {
   const variables = useStore({
@@ -219,7 +219,7 @@ export default component$(() => {
     stageName: "Lady Gaga"
   })
 
-  const {executeQuery$, data} = useLazyQuery(
+  const {executeMutation$, data} = useMutation(
     gql`
       mutation AddArtist($name: String!, $stageName: String!) {
         hero(name: $name, stageName: $stageName) {
