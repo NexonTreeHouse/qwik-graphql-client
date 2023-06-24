@@ -140,7 +140,7 @@ export default component$(() => {
 
 ### Using a Client Without the Context Provider
 
-You can use a GraphQL a separate client independently of the context provider by passing a `clientGenerator$` function into hooks. Note: This only works with `useLazyQuery` and `useMutation` hooks.
+You can use a separate GraphQL client independent of the context provider by passing a `clientGenerator$` function into hooks. Note: This only works with `useLazyQuery` and `useMutation` hooks.
 
 ```tsx
 import {
