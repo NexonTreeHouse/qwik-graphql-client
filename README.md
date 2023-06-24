@@ -1,6 +1,6 @@
 # qwik-graphql-request
 
-Simple GraphQL client and hook for [Qwik](https://qwik.builder.io/) applications build upon [Apollo Client](https://www.apollographql.com/docs/react/).
+Simple GraphQL client and hook for [Qwik](https://qwik.builder.io/) applications built upon [Apollo Client](https://www.apollographql.com/docs/react/).
 
 [![npm version](https://badge.fury.io/js/qwik-graphql-client.svg?kill_cache=1)](https://badge.fury.io/js/qwik-graphql-client)
 
@@ -69,7 +69,7 @@ export default component$(() => {
 });
 ```
 
-Then in child components you can use the `useQuery` hook to make GraphQL requests and consume them using Qwik's `<Resource>` component.
+Then, in child components you can use the `useQuery` hook to make GraphQL requests and consume them using Qwik's `<Resource>` component.
 
 ```tsx
 import { useQuery, gql } from "qwik-graphql-client";
