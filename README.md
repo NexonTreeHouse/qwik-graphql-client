@@ -1,6 +1,6 @@
 # qwik-graphql-request
 
-Simple GraphQL client and hook for [Qwik](https://qwik.builder.io/) applications build upon [Apollo Client](https://www.apollographql.com/docs/react/).
+Simple GraphQL client and hook for [Qwik](https://qwik.builder.io/) applications built upon [Apollo Client](https://www.apollographql.com/docs/react/).
 
 [![npm version](https://badge.fury.io/js/qwik-graphql-client.svg?kill_cache=1)](https://badge.fury.io/js/qwik-graphql-client)
 
@@ -69,7 +69,7 @@ export default component$(() => {
 });
 ```
 
-Then in child components you can use the `useQuery` hook to make GraphQL requests and consume them using Qwik's `<Resource>` component.
+Then, in child components you can use the `useQuery` hook to make GraphQL requests and consume them using Qwik's `<Resource>` component.
 
 ```tsx
 import { useQuery, gql } from "qwik-graphql-client";
@@ -140,7 +140,7 @@ export default component$(() => {
 
 ### Using a Client Without the Context Provider
 
-You can use a GraphQL a separate client independently of the context provider by passing a `clientGenerator$` function into hooks. Note: This only works with `useLazyQuery` and `useMutation` hooks.
+You can use a separate GraphQL client independent of the context provider by passing a `clientGenerator$` function into hooks. Note: This only works with `useLazyQuery` and `useMutation` hooks.
 
 ```tsx
 import {
@@ -175,7 +175,7 @@ export const useHero = (artistID: string) => {
 
 ### Using `useLazyQuery`
 
-The `useLazyQuery` hook is also available to use. It works the same as the `useQuery` hook except it does not automatically execute the query. Instead it returns a function that can be called to execute the query.
+The `useLazyQuery` hook is also available to use. It works the same as the `useQuery` hook except it does not automatically execute the query. Instead, it returns a function that can be called to execute the query.
 
 ```tsx
 import { useLazyQuery, gql } from "qwik-graphql-client";
@@ -208,10 +208,10 @@ export default component$(() => {
 
 ### Using `useMutation`
 
-The `useMutation` hook allows creating mutations to graphql servers. It works the similar to the `useLazyQuery` hook in that it returns a function that can be called to execute the mutation.
+The `useMutation` hook allows creating mutations to graphql servers. It works similar to the `useLazyQuery` hook in that it returns a function that can be called to execute the mutation.
 
 ```tsx
-import { useLazyQuery, gql } from "qwik-graphql-client";
+import { useMutation, gql } from "qwik-graphql-client";
 
 export default component$(() => {
   const variables = useStore({
@@ -219,7 +219,7 @@ export default component$(() => {
     stageName: "Lady Gaga"
   })
 
-  const {executeQuery$, data} = useLazyQuery(
+  const {executeMutation$, data} = useMutation(
     gql`
       mutation AddArtist($name: String!, $stageName: String!) {
         hero(name: $name, stageName: $stageName) {
